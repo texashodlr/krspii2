@@ -17,10 +17,19 @@ Initially I'm running this on a BM Server:
 `Description:    Ubuntu 22.04.5 LTS`
 `Release:        22.04`
 `Codename:       jammy`
+With an `Nvidia GTX 3070 Ti`
 
-With an Nvidia GTX 3070 Ti
+### Proposed Pipeline Stages
 
-### Docker Installation:
+1. Data preparation  	     -- Cleaning and preprocessing raw text dataset (PDFs)
+1.1. Implementation: Collection of Whitepapers (PDFs) and convert them into a format for LLM fine-tuning.
+	Script reads the data from local storage and writes processed data to a PVC vol? -- and tokenizes it using a tokenizer
+	Load the script into a Docker image and deploy as a k8s job in the data-prep namespace.
+2. Model Fine-Tuning 	     -- Training the LLM on the preprocessed data using GPUs
+3. Inference Deployment      -- Deploy the fine-tuned model as a scalable API for text generation
+4. Monitoring and Automation -- Monitor the performance and automate updates via `CI/CD`
+
+#### Docker Installation:
 1. `sudo apt update`
 2. `sudo apt install -y apt-transport-https ca-certificates curl software-properties-common`
 3. `curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg`
@@ -29,19 +38,19 @@ With an Nvidia GTX 3070 Ti
 6. `sudo systemctl start docker && sudo systemctl enable docker`
 7. `sudo usermod -aG docker $USER`
 
-### Minikube Installation
+#### Minikube Installation
 1. `curl -LO https://github.com/kubernetes/minikube/releases/latest/download/minikube-linux-amd64`
 2. `sudo install minikube-linux-amd64 /usr/local/bin/minikube && rm minikube-linux-amd64`
 3. `minikube version`
 4. `minikube start --driver=docker`
 5. `minikube config set driver docker`
 
-### Kubectl Installation
+#### Kubectl Installation
 1. `curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"`
 2. `sudo install kubectl /usr/local/bin/kubectl`
 3. `kubectl version --client`
 
-### Nvidia Container/Docker Toolkit
+#### Nvidia Container/Docker Toolkit
 1. `curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
   && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
     sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
@@ -54,8 +63,7 @@ With an Nvidia GTX 3070 Ti
       libnvidia-container-tools=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
       libnvidia-container1=${NVIDIA_CONTAINER_TOOLKIT_VERSION}`
 
-
-### General Minikube
+#### General Minikube
 1. `minikube start --driver=docker --container-runtime=docker --gpus all`
 2. `minikube addons enable nvidia-device-plugin`
 3. `kubectl get nodes -o json | jq .items[].status.capacity`
