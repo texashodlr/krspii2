@@ -34,10 +34,33 @@ With an Nvidia GTX 3070 Ti
 2. `sudo install minikube-linux-amd64 /usr/local/bin/minikube && rm minikube-linux-amd64`
 3. `minikube version`
 4. `minikube start --driver=docker`
+5. `minikube config set driver docker`
 
 ### Kubectl Installation
 1. `curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"`
 2. `sudo install kubectl /usr/local/bin/kubectl`
 3. `kubectl version --client`
 
+### Nvidia Container/Docker Toolkit
+1. `curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
+  && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
+    sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+    sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list`
+2. `sudo apt-get update`
+3. `NVIDIA_CONTAINER_TOOLKIT_VERSION=1.17.8-1`
+4. `sudo apt-get install -y \
+      nvidia-container-toolkit=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
+      nvidia-container-toolkit-base=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
+      libnvidia-container-tools=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
+      libnvidia-container1=${NVIDIA_CONTAINER_TOOLKIT_VERSION}`
 
+
+### General Minikube
+1. `minikube start --driver=docker --container-runtime=docker --gpus all`
+2. `minikube addons enable nvidia-device-plugin`
+3. `kubectl get nodes -o json | jq .items[].status.capacity`
+4. Verify this outputs 0: `sudo sysctl net.core.bpf_jit_harden`
+5. `sudo nvidia-ctk runtime configure --runtime=docker && sudo systemctl restart docker`
+6. `minikube delete`
+7. `minikube start --driver docker --container-runtime docker --gpus all`
+8. Nvidia should now print: `kubectl get nodes -ojson | jq .items[].status.capacity`
