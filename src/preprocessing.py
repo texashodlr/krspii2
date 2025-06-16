@@ -27,10 +27,10 @@ for page in doc:
 def token_input(token_file = 'token.txt'):
     with open(token_file, 'r') as file:
         lines = file.readlines()
-    return lines[0]
+    return str(lines[0])
 
 def preprocess_pdf(pdf_path, output_path, HF_Token, tokenizer_name="mistralai/Mixtral-8x7B-v0.1"):
-    tokenize = AutoTokenizer.from_pretrained(tokenizer_name, HF_Token)
+    tokenize = AutoTokenizer.from_pretrained(tokenizer_name, token=HF_Token)
     with pdfplumber.open(pdf_path) as pdf:
         text = ""
         for page in pdf.pages:
