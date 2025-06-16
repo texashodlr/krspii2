@@ -24,8 +24,13 @@ for page in doc:
         print(block[4])
 """
 
-def preprocess_pdf(pdf_path, output_path, tokenizer_name="mistralai/Mixtral-8x7B-v0.1"):
-    tokenize = AutoTokenizer.from_pretrained(tokenizer_name)
+def token_input(token_file = 'token.txt'):
+    with open(token_file, 'r') as file:
+        lines = file.readlines()
+    return lines[0]
+
+def preprocess_pdf(pdf_path, output_path, HF_Token, tokenizer_name="mistralai/Mixtral-8x7B-v0.1"):
+    tokenize = AutoTokenizer.from_pretrained(tokenizer_name, HF_Token)
     with pdfplumber.open(pdf_path) as pdf:
         text = ""
         for page in pdf.pages:
@@ -33,13 +38,16 @@ def preprocess_pdf(pdf_path, output_path, tokenizer_name="mistralai/Mixtral-8x7B
 
     text = text.replace("\n"," ").strip()
 
-    tokens = tokenizer(text, truncation=True, max_length=512)["input_ids"]
+    tokens = tokenize(text, truncation=True, max_length=512)["input_ids"]
 
     with open(output_path, "w") as f:
         json.dump({"text": tokens}, f)
         f.write("\n")
 
-login()
+HF_Token = token_input()
+print(HF_Token)
+
+# login()
 input_dir  = "../data/pdfs"
 output_dir = "../data/processed"
 
@@ -48,5 +56,6 @@ os.makedirs(output_dir, exist_ok=True)
 for pdf_file in os.listdir(input_dir):
     preprocess_pdf(
             os.path.join(input_dir, pdf_file),
-            os.path.join(output_dir,f"{pdf_file}.jsonl")
+            os.path.join(output_dir,f"{pdf_file}.jsonl"),
+            HF_Token
             )
