@@ -1,0 +1,19 @@
+FROM python:3.10-slim
+
+WORKDIR /app
+
+#Installing System Dependencies
+RUN apt-get update && apt-get install -y libmagic1 && rm -rf /var/lib/apt/lists*
+
+# Copy Requirements file
+COPY requirements.txt .
+
+# Install the Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the preprocessing script
+COPY preprocess_pdfs.py .
+
+# Command to run the script
+#CMD["python", "preprocess_pdfs.py", "--input-dir", "/data/pdfs", "--output-dir", "/data/processed", "--tokenizer-name", "mistralai/Mixtral-8x7B-v0.1", "--max-length", "512"]
+CMD ["python", "preprocess_pdfs.py"]
