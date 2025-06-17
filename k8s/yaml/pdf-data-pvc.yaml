@@ -9,5 +9,5 @@ spec:
   resources:
     requests:
       storage: 2Gi
-  StorageClassName: standard
+  storageClassName: standard
   volumeName: pdf-data-pv
