@@ -11,6 +11,9 @@ COPY requirements.txt .
 # Install the Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Never forget your banana!
+COPY banana.txt .
+
 # Copy the preprocessing script
 COPY preprocess_pdfs.py .
 
