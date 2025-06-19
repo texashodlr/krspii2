@@ -26,8 +26,8 @@ for page in doc:
 
 def token_input(token_file = 'banana.txt'):
     with open(token_file, 'r') as file:
-        lines = file.readlines()
-    return str(lines[0])
+        token = file.readline().strip()
+    return token
 
 def preprocess_pdf(pdf_path, output_path, HF_Token, tokenizer_name="mistralai/Mixtral-8x7B-v0.1"):
     tokenize = AutoTokenizer.from_pretrained(tokenizer_name, token=HF_Token)
