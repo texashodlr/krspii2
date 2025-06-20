@@ -48,14 +48,17 @@ HF_Token = token_input()
 print(HF_Token)
 
 # login()
-input_dir  = "../data/pdfs"
-output_dir = "../data/processed"
-
-
+input_dir  = "/data/pdfs"
+os.makedirs(input_dir, exist_ok=True)
+output_dir = "/data/processed"
 os.makedirs(output_dir, exist_ok=True)
+
+
 for pdf_file in os.listdir(input_dir):
-    preprocess_pdf(
-            os.path.join(input_dir, pdf_file),
-            os.path.join(output_dir,f"{pdf_file}.jsonl"),
-            HF_Token
-            )
+    full_path = os.path.join(input_dir, pdf_file)
+    if os.path.isfile(full_path) and pdf_file.lower().endswith(".pdf"):
+        preprocess_pdf(
+                os.path.join(input_dir, pdf_file),
+                os.path.join(output_dir,f"{pdf_file}.jsonl"),
+                HF_Token
+        )
