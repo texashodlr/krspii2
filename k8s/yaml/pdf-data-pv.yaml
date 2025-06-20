@@ -9,7 +9,7 @@ spec:
   accessModes:
     - ReadWriteMany
   hostPath:
-    path: /mnt/pdf-data
+    path: /mnt/data
   claimRef:
     name: pdf-data-pvc
     namespace: data-prep

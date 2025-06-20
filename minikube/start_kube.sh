@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# Making the node directory, assuming it didn't already exist
+pdf_data='/mnt/data'
+
+sudo mkdir -p "$pdf_data"
+
+echo "Directory '$pdf_data' created (if it didn't already exist)."
+
+# Starting Minikube
 minikube start --driver=docker --container-runtime=docker --gpus all
 
 kubectl create ns data-prep
@@ -18,3 +26,6 @@ echo -e "\nPod is ready. Running command: "
 
 kubectl cp ./data/pdfs/. data-prep/pdf-uploader:/data
 kubectl -n data-prep exec pdf-uploader -- sh -c "ls -lh /data"
+
+# Applying the yaml for PDF to JSONL Job.
+kubectl apply -f k8s/yaml/preprocess_pdfs_job.yaml

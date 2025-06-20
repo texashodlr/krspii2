@@ -9,7 +9,7 @@ spec:
     image: busybox
     command: ['sh', '-c', 'sleep 3600']
     volumeMounts:
-      - mountPath: /data
+      - mountPath: /data/pdfs
         name: pdf-volume
   volumes:
     - name: pdf-volume
