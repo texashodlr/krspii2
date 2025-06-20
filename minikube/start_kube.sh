@@ -24,8 +24,8 @@ done
 
 echo -e "\nPod is ready. Running command: "
 
-kubectl cp ./data/pdfs/. data-prep/pdf-uploader:/data
-kubectl -n data-prep exec pdf-uploader -- sh -c "ls -lh /data"
+kubectl cp ./data/pdfs/. data-prep/pdf-uploader:/data/pdfs
+kubectl -n data-prep exec pdf-uploader -- sh -c "ls -lh /data/pdfs"
 
 # Applying the yaml for PDF to JSONL Job.
 kubectl apply -f k8s/yaml/preprocess_pdfs_job.yaml
