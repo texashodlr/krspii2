@@ -10,7 +10,7 @@ spec:
     spec:
       containers:
       - name: pdf-processor
-        image: baldbodybuilder/pdf-preprocessor:v1.3
+        image: baldbodybuilder/pdf-preprocessor:v1.6
         resources:
           limits:
             cpu: "2"

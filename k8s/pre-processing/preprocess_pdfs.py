@@ -6,23 +6,11 @@ We'll take raw PDFs in this format
 3. Tokenization
 4. Storage
 """
-#import fitz
 import pdfplumber
 import json
 from transformers import AutoTokenizer
 import os
 from huggingface_hub import login
-
-# Extraction
-"""
-doc = fitz.open("example.pdf")
-for page in doc:
-    print(page.get_text())
-for page in doc:
-    blocks = page.get_text("blocks")
-    for block in blocks:
-        print(block[4])
-"""
 
 def token_input(token_file = 'banana.txt'):
     with open(token_file, 'r') as file:
@@ -31,6 +19,7 @@ def token_input(token_file = 'banana.txt'):
 
 def preprocess_pdf(pdf_path, output_path, HF_Token, tokenizer_name="mistralai/Mixtral-8x7B-v0.1"):
     tokenize = AutoTokenizer.from_pretrained(tokenizer_name, token=HF_Token)
+    print(pdf_path)
     with pdfplumber.open(pdf_path) as pdf:
         text = ""
         for page in pdf.pages:
@@ -48,17 +37,20 @@ HF_Token = token_input()
 print(HF_Token)
 
 # login()
-input_dir  = "/data/pdfs"
+input_dir  = "../../data/pdfs"
 os.makedirs(input_dir, exist_ok=True)
-output_dir = "/data/processed"
+output_dir = "../../data/processed"
 os.makedirs(output_dir, exist_ok=True)
+print(f"input_dir: {input_dir}")
+print(f"output_dir: {output_dir}")
+ 
 
-
+print("Processing pdfs")
 for pdf_file in os.listdir(input_dir):
-    full_path = os.path.join(input_dir, pdf_file)
-    if os.path.isfile(full_path) and pdf_file.lower().endswith(".pdf"):
-        preprocess_pdf(
-                os.path.join(input_dir, pdf_file),
-                os.path.join(output_dir,f"{pdf_file}.jsonl"),
-                HF_Token
-        )
+    print(f"input_dir: {input_dir}")
+    print(f"input_file: {pdf_file}")
+    preprocess_pdf(
+            os.path.join(input_dir, pdf_file),
+            os.path.join(output_dir,f"{pdf_file}.jsonl"),
+            HF_Token
+            )

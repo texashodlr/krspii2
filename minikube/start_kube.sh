@@ -18,14 +18,14 @@ kubectl apply -f k8s/yaml/pdf_loader.yaml
 # Wait until the pdf-loader pod is ready
 echo "Waiting for pod pdf-uploader in data-prep to be ready..."
 until kubectl -n data-prep get pod pdf-uploader -o jsonpath="{.status.containerStatuses[0].ready}" 2>/dev/null | grep -q true; do
-	echo -n "."
-	sleep 2
+        echo -n "."
+        sleep 2
 done
 
 echo -e "\nPod is ready. Running command: "
 
-kubectl cp ./data/pdfs/. data-prep/pdf-uploader:/data/pdfs
-kubectl -n data-prep exec pdf-uploader -- sh -c "ls -lh /data/pdfs"
+kubectl cp ./data/pdfs/. data-prep/pdf-uploader:/data/pdfs/pdfs
+kubectl -n data-prep exec pdf-uploader -- sh -c "ls -lh /data/pdfs/pdfs"
 
 # Applying the yaml for PDF to JSONL Job.
-kubectl apply -f k8s/yaml/preprocess_pdfs_job.yaml
+# kubectl apply -f k8s/yaml/preprocess_pdfs_job.yaml

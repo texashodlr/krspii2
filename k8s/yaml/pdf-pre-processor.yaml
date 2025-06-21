@@ -6,8 +6,7 @@ metadata:
 spec:
   containers:
   - name: uploader
-    image: baldbodybuilder/pdf-preprocessor:v1.3
-      #command: ['sh', '-c', 'sleep 3600']
+    image: baldbodybuilder/pdf-preprocessor:v1.6
     resources:
       limits:
         cpu: "2"
