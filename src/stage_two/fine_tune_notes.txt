@@ -1,0 +1,10 @@
+# General notes from my own learnings on the fine tuning script.
+
+Code is being written on a laptop with a GPU: 4070M (~8GB VRAM)
+	Intended to run on a workstation with a 3070Ti (~8GB VRAM)
+	Intended to run a workstation with two 1070s (~16/8GB VRAM)
+
+
+Noticed that all of my jsonl files begin with:
+	{"text":[tokenids....]} so wrote the text_to_tokenid.py script to replace with:
+	{"token_id":[tokenids...]}
