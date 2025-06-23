@@ -27,8 +27,26 @@ $Total VRAM = Quantized Model Weights + LoRA Adapter Weights + Reduced Optimizer
 General estimate: 7GB for the actual model, 1GB for CUDA + PyTorch + K8s pod overhead.
 
 Quantization: Likely using 4-Bit so we're storing model weights in 4-bit format which reduces memory, comparatively by ~4x to FP16 -> 2B/parameter or 16b.
-	LoRA: Trains low-rank
+	LoRA: Trains low-rank adapters thus minimizing optimizer and gradient memory
+	Mixed Precision (FP16 + BF16) to further optimize
+### Model sizing
+Model parameter sizes actually mean something when dealing with workstation/laptop gpus which are necessarily constrained 
 
+1. Mixtral-8x7B
+Originally wanted to use this model but... with 46.7B parameters at 2B each that's not feasible:
+ - 46.7B * 2B = 93.4GB, the model only uses (actively) 12.6B of said parameters -> 25.2GB
+ - Luckily we can convert those 25.2GB of active weights to 4B quantized weights and we're at 12.6B*0.5B = 6.3GB
+ - But this is already practically at the VRAM budget.
+2. Mistral-7B-v0.1
+What I'm using now to implement
+ - 7.3B parameters -> 7.3B * 2B = 14.6GB but with 4B Quantization we go to -> 7.3B*0.5B = 3.65GB, much more digestible.
+3. LLaMA-2-7B
+Another option at 7B parameters, can easily fit.
+4. GROK-3-9B
+Another option at 9B parameters, but the isn't entirely public and requires more custom work with HF's API
+
+
+## Side note, jsonl fix
 Noticed that all of my jsonl files begin with:
 	{"text":[tokenids....]} so wrote the text_to_tokenid.py script to replace with:
 	{"token_id":[tokenids...]}
