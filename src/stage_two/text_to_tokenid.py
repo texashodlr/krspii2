@@ -11,7 +11,7 @@ def rename_jsonl(input_dir, output_dir):
     os.makedirs(output_dir, exist_ok=True)
     for filename in os.listdir(input_dir):
         if filename.endswith(".jsonl"):
-            input_path = os.path,join(input_dir, filename)
+            input_path = os.path.join(input_dir, filename)
             output_path = os.path.join(output_dir, filename)
             with open(input_path, "r", encoding="utf-8") as infile, open(output_path,
                     "w", encoding="utf-8") as outfile:

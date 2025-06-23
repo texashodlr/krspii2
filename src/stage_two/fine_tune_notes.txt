@@ -3,7 +3,31 @@
 Code is being written on a laptop with a GPU: 4070M (~8GB VRAM)
 	Intended to run on a workstation with a 3070Ti (~8GB VRAM)
 	Intended to run a workstation with two 1070s (~16/8GB VRAM)
+	
+So all things considered we can officially consider our VRAM budget to be 8GB.
 
+This means we must limit the scope of our fine-tuning to a memory budget with model weights, optimizer states, gradients and training overheads all within 8GB (but probably less due to k8s).
+	We will lean on parameter efficient fine-tuning (PEFT) techniques like LoRA and quantization.
+
+## What eats my memory budget?
+
+Fine-tuning this mistral model requires that I store:
+1. Model Weights
+2. Optimizer States (potentially 2-3x model weights)
+3. Gradients (~same size as weights)
+4. Activation Memory (potentially same size as weights)
+5. General Overhead (CUDA/pytorch/and other runtime buffers)
+
+We can consider the full equation as:
+$Total VRAM = Model Weights + Optimizer States + Gradients + Activations + General Overheads$
+
+With LoRA:
+$Total VRAM = Quantized Model Weights + LoRA Adapter Weights + Reduced Optimizer States + Activations + Overhead$
+
+General estimate: 7GB for the actual model, 1GB for CUDA + PyTorch + K8s pod overhead.
+
+Quantization: Likely using 4-Bit so we're storing model weights in 4-bit format which reduces memory, comparatively by ~4x to FP16 -> 2B/parameter or 16b.
+	LoRA: Trains low-rank
 
 Noticed that all of my jsonl files begin with:
 	{"text":[tokenids....]} so wrote the text_to_tokenid.py script to replace with:
