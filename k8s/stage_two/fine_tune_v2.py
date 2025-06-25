@@ -21,12 +21,15 @@ import torch
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-def token_input(token = 'banana.txt'):
+
+def token_input(token_file = 'banana.txt'):
     with open(token_file, 'r') as file:
         token = file.readline().strip()
     return token
 
-def main(data_dir, output_dir, model_name, lora_rank, max_length):
+
+
+def main(data_dir, output_dir, model_name, lora_rank, max_length, HF_Token):
     try:
         # Setting CUDA Device (either 4070, 3070 or 1070s)
         os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -35,7 +38,7 @@ def main(data_dir, output_dir, model_name, lora_rank, max_length):
 
         # Loading our tokenizer
         logger.info(f"Loading tokenizer: {model_name}")
-        tokenizer = AutoTokenizer.from_pretrained(model_name)
+        tokenizer = AutoTokenizer.from_pretrained(model_name, token=HF_Token)
         if tokenizer.pad_token is None:
             tokenizer.pad_token = tokenizer.eos_token
 
@@ -51,6 +54,7 @@ def main(data_dir, output_dir, model_name, lora_rank, max_length):
                 load_in_4bit=True,
                 torch_dtype=torch.bfloat16,
                 trust_remote_code=True,
+                token=HF_Token,
                 )
 
         # Configuring LoRA
@@ -125,4 +129,4 @@ if __name__ == "__main__":
     logger.info(f"Token for HF: {HF_Token}")
 
     # Main Call
-    main(args.data_dir, args.output_dir, args.model_name, args.lora_rank, args.max_length)
+    main(args.data_dir, args.output_dir, args.model_name, args.lora_rank, args.max_length, HF_Token)

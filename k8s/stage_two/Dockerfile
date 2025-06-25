@@ -1,4 +1,7 @@
-FROM nvidia/cuda:11.8.0-cudann8-runtime-ubuntu20.04
+FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu20.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=America/New_York
 
 # Grabbing Python dependencies
 RUN apt-get update && apt-get install -y \
@@ -6,6 +9,9 @@ RUN apt-get update && apt-get install -y \
 	python3.9-dev \
 	python3-pip \
 	git \
+	tzdata && \
+    	ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+    	echo $TZ > /etc/timezone \
 	&& rm -rf /var/lib/apt/lists/*
 
 # Working Directory
