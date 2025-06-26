@@ -107,9 +107,10 @@ def main(data_dir, output_dir, model_name, lora_rank, max_length, HF_Token):
         trainer.train()
         
         # Save the model
-        logger.info(f"Saving the model to {output_dir}")
+        logger.info(f"Saving the trainer model to {output_dir}")
         trainer.save_model(output_dir)
-        tokenizer.save_pretrained(output_dir)
+        logger.info(f"Saving the tokenizer pretrained model")
+        tokenizer.save_pretrained(output_dir, token=HF_Token)
 
     except Exception as e:
         logger.error(f"Error during fine-tuning: {str(e)}")

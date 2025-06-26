@@ -1,0 +1,33 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: fine-tuner
+  namespace: data-prep
+spec:
+  template:
+    spec:
+      containers:
+      - name: fine-tuner
+        image: baldbodybuilder/fine_tuner:v1
+        resources:
+          requests:
+            cpu: "1"
+            memory: "8Gi"
+            nvidia.com/gpu: 1
+          limits: 
+            cpu: "2"
+            memory: "16Gi"
+            nvidia.com/gpu: 1
+        volumeMounts:
+        - mountPath: /data
+          name: pdf-volume
+        - mountPath: /model
+          name: checkpoint-volume
+      volumes:
+        - name: pdf-volume
+          persistentVolumeClaim:
+            claimName: pdf-data-pvc
+        - name: checkpoint-volume
+          persistentVolumeClaim:
+            claimName: checkpoint-pvc
+      restartPolicy: OnFailure
