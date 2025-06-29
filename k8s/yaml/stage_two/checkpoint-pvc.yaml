@@ -10,4 +10,5 @@ spec:
     requests:
       storage: 10Gi
   storageClassName: standard
-  volumeName: checkpoint-pv
+  volumeName: pdf-data-pv
+    
