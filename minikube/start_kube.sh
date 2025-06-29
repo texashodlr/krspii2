@@ -13,7 +13,7 @@ minikube start --driver=docker --container-runtime=docker --gpus all
 kubectl create ns data-prep
 kubectl apply -f k8s/yaml/stage_one/pdf-data-pv.yaml
 kubectl apply -f k8s/yaml/stage_one/pdf-data-pvc.yaml
-kubectl apply -f k8s/yaml/stage_one/pdf_loader.yaml
+kubectl apply -f k8s/yaml/stage_one/pdf-loader.yaml
 
 # Wait until the pdf-loader pod is ready
 echo "Waiting for pod pdf-uploader in data-prep to be ready..."
