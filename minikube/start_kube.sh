@@ -11,6 +11,7 @@ echo "Directory '$pdf_data' created (if it didn't already exist)."
 minikube start --driver=docker --container-runtime=docker --gpus all
 
 kubectl create ns data-prep
+kubectl -n data-prep create serviceaccount default
 kubectl apply -f k8s/yaml/stage_one/pdf-data-pv.yaml
 kubectl apply -f k8s/yaml/stage_one/pdf-data-pvc.yaml
 kubectl apply -f k8s/yaml/stage_one/pdf-loader.yaml
