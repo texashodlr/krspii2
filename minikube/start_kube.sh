@@ -29,7 +29,7 @@ kubectl cp ./data/pdfs/. data-prep/pdf-uploader:/data/pdfs/pdfs
 kubectl -n data-prep exec pdf-uploader -- sh -c "ls -lh /data/pdfs/pdfs"
 
 # Applying the yaml for PDF to JSONL Job.
-kubectl apply -f k8s/yaml/stage_one/preprocess_pdfs_job.yaml
+kubectl apply -f k8s/yaml/stage_one/pdf-preprocess-job.yaml
 
 # Validating that the processed PDFs are occuring.
 echo "Waiting for the PDF to JSONL processing to complete..."
@@ -37,6 +37,7 @@ target_job=4
 target_count=24
 while true; do
 	# Jobs
+	sleep 60
 
 	completed=$(kubectl -n data-prep get job pdf-preprocess -o jsonpath='{.status.succeeded}')
 	completed=${completed:-0}
@@ -56,3 +57,7 @@ while true; do
 	fi
 done
 echo "All PDFs processed!"
+sleep 5
+
+# Apply the fine tuner job!
+kubectl apply -f k8s/yaml/stage_two/fine_tune_job_v2.yaml
