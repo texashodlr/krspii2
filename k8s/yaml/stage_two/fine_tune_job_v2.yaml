@@ -21,7 +21,7 @@ spec:
             memory: "16Gi"
             nvidia.com/gpu: 1
         volumeMounts:
-        - mountPath: /data
+        - mountPath: /data/pdfs
           name: pdf-volume
       volumes:
         - name: pdf-volume
