@@ -6,7 +6,7 @@ metadata:
 spec:
   containers:
   - name: fine-tuner
-    image: baldbodybuilder/fine_tuner:local
+    image: baldbodybuilder/fine_tuner:local_v2.3
     resources:
       requests:
         cpu: "1"
