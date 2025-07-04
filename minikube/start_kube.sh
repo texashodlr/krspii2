@@ -33,22 +33,21 @@ kubectl apply -f k8s/yaml/stage_one/pdf-preprocess-job.yaml
 
 # Validating that the processed PDFs are occuring.
 echo "Waiting for the PDF to JSONL processing to complete..."
-target_job=4
-target_count=24
+
+target_count=$(kubectl -n data-prep exec pdf-uploader -- sh -c "ls -l /data/pdfs/pdfs | wc -l")
+
 while true; do
 	# Jobs
 	sleep 60
 
-	completed=$(kubectl -n data-prep get job pdf-preprocess -o jsonpath='{.status.succeeded}')
-	completed=${completed:-0}
-	echo "Current completions: $completed"
-	if ["$completed" -eq "$target_job"]; then
-		echo "Processing job has reached $target completions."
-	fi
-
+	#completed=$(kubectl -n data-prep get job pdf-preprocess -o jsonpath='{.status.succeeded}')
+	#completed=${completed:-0}
+	#echo "Current completions: $completed"
+	#if ["$completed" -eq "$target_job"]; then
+	#	echo "Processing job has reached $target completions."
+	#fi
 	file_count=$(kubectl -n data-prep exec pdf-uploader -- sh -c "ls -l /data/pdfs/processed | wc -l")
-	#file_count=$(ls -l "/data/pdfs/processed" | wc -l)
-	echo "Current file count: $file_count"
+	echo "PDF count: $target_count | Processed file count: $file_count"
 	if ["$file_count" -eq "$target_count"]; then
 		echo "Directory now has $target_count files!"
 		echo -n "."
@@ -59,5 +58,17 @@ done
 echo "All PDFs processed!"
 sleep 5
 
+# Now need to format the .jsonl to remove 'text' -> 'input_ids'
+kubectl apply -f k8s/yaml/stage_one_pdf-text-token-converter.yaml
+sleep 5
+kubectl -n data-prep get pods
+# Checking logs
+kubectl -n data-prep logs pdf-text-token-converter
+sleep 5
+kubectl -n data-prep logs pdf-text-token-converter
+kubectl -n data-prep exec pdf-uploader -- sh -c "ls -l /data/pdfs/processed | wc -l"
+kubectl -n data-prep exec pdf-uploader -- sh -c "ls -l /data/pdfs/pruned | wc -l"
+sleep 5
+
 # Apply the fine tuner job!
-kubectl apply -f k8s/yaml/stage_two/fine_tune_job_v2.yaml
+kubectl apply -f k8s/yaml/stage_two/fine-tune-pod.yaml

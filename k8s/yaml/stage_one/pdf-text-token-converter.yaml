@@ -5,9 +5,9 @@ metadata:
   namespace: data-prep
 spec:
   containers:
-  - name: uploader
-    image: busybox
-    command: ['sh', '-c', 'sleep 3600']
+  - name: pdf-text-token-converteg
+    image: baldbodybuilder/text-token-converter:local
+    command: ['sh', '-c', 'echo "Sleeping for 5"; sleep 5; python text-to-tokenid.py --input-dir /data/pdfs/processed --output-dir /data/pdfs/pruned']
     volumeMounts:
       - mountPath: /data/pdfs
         name: pdf-volume
