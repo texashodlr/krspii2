@@ -58,6 +58,7 @@ def main(data_dir, output_dir, model_name, lora_rank, max_length, HF_Token):
                 )
 
         # Configuring LoRA
+        logger.info("Setting LoRA config")
         lora_config = LoraConfig(
                 r=lora_rank,
                 lora_alpha=16,
@@ -68,16 +69,19 @@ def main(data_dir, output_dir, model_name, lora_rank, max_length, HF_Token):
                 )
 
         # Sending Model
+        logger.info("Sending model to device")
         model = get_peft_model(model, lora_config)
         model.to(device)
         
         # Data collator for causal LM
+        logger.info("Setting Data Collator")
         data_collator = DataCollatorForLanguageModeling(
                 tokenizer=tokenizer,
                 mlm=False,
                 )
 
         # Training Arguements
+        logger.info("Setting training arguments")
         training_args = TrainingArguments(
                 output_dir=output_dir,
                 per_device_train_batch_size=1,
@@ -94,6 +98,7 @@ def main(data_dir, output_dir, model_name, lora_rank, max_length, HF_Token):
                 )
         
         # Init Trainer
+        logger.info("Setting the trainer")
         trainer = Trainer(
                 model=model,
                 args=training_args,

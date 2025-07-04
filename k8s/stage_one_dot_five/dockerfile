@@ -1,0 +1,19 @@
+FROM python:3.10-slim
+
+WORKDIR /app
+
+#Installing System Dependencies
+RUN apt-get update && apt-get install -y libmagic1 && rm -rf /var/lib/apt/lists*
+
+# Copy Requirements file
+COPY requirements.txt .
+
+# Install the Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+
+# Copy the preprocessing script
+COPY text-to-tokenid.py .
+
+# Command to run the script
+CMD ["python", "text-to-tokenid.py"]
