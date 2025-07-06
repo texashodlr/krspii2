@@ -48,7 +48,7 @@ while true; do
 	#fi
 	file_count=$(kubectl -n data-prep exec pdf-uploader -- sh -c "ls -l /data/pdfs/processed | wc -l")
 	echo "PDF count: $target_count | Processed file count: $file_count"
-	if ["$file_count" -eq "$target_count"]; then
+	if [ "$file_count" -eq "$target_count" ]; then
 		echo "Directory now has $target_count files!"
 		echo -n "."
 		sleep 2
@@ -59,16 +59,21 @@ echo "All PDFs processed!"
 sleep 5
 
 # Now need to format the .jsonl to remove 'text' -> 'input_ids'
-kubectl apply -f k8s/yaml/stage_one_pdf-text-token-converter.yaml
+kubectl apply -f k8s/yaml/stage_one/pdf-text-token-converter.yaml
 sleep 5
 kubectl -n data-prep get pods
 # Checking logs
 kubectl -n data-prep logs pdf-text-token-converter
-sleep 5
+sleep 60
 kubectl -n data-prep logs pdf-text-token-converter
 kubectl -n data-prep exec pdf-uploader -- sh -c "ls -l /data/pdfs/processed | wc -l"
 kubectl -n data-prep exec pdf-uploader -- sh -c "ls -l /data/pdfs/pruned | wc -l"
 sleep 5
 
+# Cleaning up
+kubectl -n data-prep delete pod pdf-text-token-converter --force
+
 # Apply the fine tuner job!
 kubectl apply -f k8s/yaml/stage_two/fine-tune-pod.yaml
+
+# python3 fine_tune_v2.py --data-dir /data/pdfs/pruned --output-dir /data/pdfs/model --model-name mistralai/Mistral-7B-v0.1 --lora-rank 8 --max-length 512
