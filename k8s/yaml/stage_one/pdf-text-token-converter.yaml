@@ -5,7 +5,7 @@ metadata:
   namespace: data-prep
 spec:
   containers:
-  - name: pdf-text-token-converteg
+  - name: pdf-text-token-converter
     image: baldbodybuilder/text-token-converter:local
     command: ['sh', '-c', 'echo "Sleeping for 5"; sleep 5; python text-to-tokenid.py --input-dir /data/pdfs/processed --output-dir /data/pdfs/pruned']
     volumeMounts:

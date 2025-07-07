@@ -6,7 +6,7 @@ metadata:
 spec:
   containers:
   - name: fine-tuner
-    image: baldbodybuilder/fine_tuner:local_v2.3
+    image: baldbodybuilder/fine_tuner:local_v2.7
     resources:
       requests:
         cpu: "1"
@@ -19,7 +19,7 @@ spec:
     volumeMounts:
       - mountPath: /data/pdfs
         name: pdf-volume
-    volumes:
-      - name: pdf-volume
-        persistentVolumeClaim:
-          claimName: pdf-data-pvc
+  volumes:
+    - name: pdf-volume
+      persistentVolumeClaim:
+        claimName: pdf-data-pvc
