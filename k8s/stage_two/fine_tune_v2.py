@@ -115,7 +115,7 @@ def main(data_dir, output_dir, model_name, lora_rank, max_length, HF_Token):
         training_args = TrainingArguments(
                 output_dir=output_dir,
                 per_device_train_batch_size=1,
-                gradient_accumulation_steps=8,
+                #gradient_accumulation_steps=8,
                 learning_rate=1e-4,
                 num_train_epochs=1,
                 max_steps=-1,
@@ -125,7 +125,7 @@ def main(data_dir, output_dir, model_name, lora_rank, max_length, HF_Token):
                 fp16=True,
                 remove_unused_columns=False,
                 report_to="none",
-                gradient_checkpointing=True,
+                #gradient_checkpointing=True,
                 )
         
         # Init Trainer
