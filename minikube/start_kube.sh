@@ -68,9 +68,10 @@ sleep 60
 kubectl -n data-prep logs pdf-text-token-converter
 kubectl -n data-prep exec pdf-uploader -- sh -c "ls -l /data/pdfs/processed | wc -l"
 kubectl -n data-prep exec pdf-uploader -- sh -c "ls -l /data/pdfs/pruned | wc -l"
-sleep 5
+sleep 60
 
 # Cleaning up
+kubectl -n data-prep delete job pdf-preprocessor
 kubectl -n data-prep delete pod pdf-text-token-converter --force
 
 # Apply the fine tuner job!

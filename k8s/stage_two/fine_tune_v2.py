@@ -97,6 +97,7 @@ def main(data_dir, output_dir, model_name, lora_rank, max_length, HF_Token):
         # Sending Model
         logger.info("Sending model to device")
         model = get_peft_model(model, lora_config)
+        model.enable_input_require_grads()
         model.to(device)
         logger.info(f"Post-LoRA GPU Memory Allocated: {torch.cuda.memory_allocated() / 1024**3:.2f} GB")
         torch.cuda.empty_cache()
@@ -115,9 +116,9 @@ def main(data_dir, output_dir, model_name, lora_rank, max_length, HF_Token):
         training_args = TrainingArguments(
                 output_dir=output_dir,
                 per_device_train_batch_size=1,
-                #gradient_accumulation_steps=8,
+                gradient_accumulation_steps=2,
                 learning_rate=1e-4,
-                num_train_epochs=1,
+                num_train_epochs=10,
                 max_steps=-1,
                 logging_steps=10,
                 save_steps=100,
@@ -125,7 +126,7 @@ def main(data_dir, output_dir, model_name, lora_rank, max_length, HF_Token):
                 fp16=True,
                 remove_unused_columns=False,
                 report_to="none",
-                #gradient_checkpointing=True,
+                gradient_checkpointing=True,
                 )
         
         # Init Trainer
