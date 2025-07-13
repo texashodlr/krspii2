@@ -65,20 +65,37 @@ logger.info(f"GPU memory reserved: {torch.cuda.memory_reserved() / 1024**3:.2f} 
 model.to(device)
 
 # Simple Prompt
-prompt = input("Please talk to the model!")
-inputs = tokenizer(prompt, return_tensors="pt").to(device)
+conversation = []
 
-# Generating the output
-with torch.no_grad():
-    output = model.generate(
-            **inputs,
-            max_new_tokens=1000,
-            do_sample=True,
-            temperature=0.7,
-            top_p=.95,
-            eos_token_id=tokenizer.eos_token_id,
-    )
+print("You're about to start chatting with Brother-Bot! (Type `exit` to stop!)")
 
-# Decode and print
-response = tokenizer.decode(output[0], skip_special_tokens=True)
-print(f"\n++++ Response ++++\n{response}")
+while True:
+    new_input = input("Speak to me, brother: ")
+    if new_input.lower() in ["exit", "quit"]:
+        break
+    conversation.append(f"User: {new_input}")
+
+    prompt = "\n".join(conversation) + "\nBrother-Bot:"
+    
+    inputs = tokenizer(prompt, return_tensors="pt").to(device)
+
+    # Generating the output
+    with torch.no_grad():
+        output = model.generate(
+                **inputs,
+                max_new_tokens=100,
+                do_sample=True,
+                temperature=0.7,
+                top_p=.95,
+                eos_token_id=tokenizer.eos_token_id,
+        )
+    # Model's response only
+    # Decode and print
+    generated_text = tokenizer.decode(output[0], skip_special_tokens=True)
+
+    # Extracting his answer
+    reply = generated_text[len(prompt):].strip()
+    print(f"Brother-Bot: {reply}")
+    conversation.append(f"Brother-Bot: {reply}")
+
+    print(f"\n++++ End Response ++++\n")
