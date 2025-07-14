@@ -5,10 +5,11 @@ import subprocess
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, TrainingArguments, Trainer, DataCollatorForLanguageModeling
 from peft import PeftModel
 import torch
+import gradio as gr
 
 # Importing model and adapters from previous pod which fine-tuned the model
 base_model = "mistralai/Mistral-7B-v0.1"
-adapter_path = "../../data/model"
+adapter_path = "/data/pdfs/model"
 use_bfloat16 = True
 
 
@@ -16,20 +17,19 @@ use_bfloat16 = True
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-
+"""
 def token_input(token_file = 'banana.txt'):
     with open(token_file, 'r') as file:
         token = file.readline().strip()
     return token
 
 def log_gpu_processes():
-    """Added this in to combat 3070 OOM fails, calls nvidia-smi"""
     try:
         nvidia_smi_output = subprocess.check_output(["nvidia-smi"], text=True)
         logger.info(f"nvidia-smi output:\n{nvidia_smi_output}")
     except subprocess.CalledProcessError as e:
         logger.warning(f"Failed to run nvidia-smi: {e}")
-
+"""
 
 # Loading the tokenizer
 tokenizer = AutoTokenizer.from_pretrained(adapter_path)
@@ -53,49 +53,34 @@ base = AutoModelForCausalLM.from_pretrained(
 model = PeftModel.from_pretrained(base, adapter_path)
 model.eval()
 
-# Moving to the GPU
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# print("You're about to start chatting with Brother-Bot! (Type `exit` to stop!)")
 
-# Actually setting the CUDA Device
-logger.info(f"Using device: {device}")
-logger.info(f"GPU memory allocated: {torch.cuda.memory_allocated() / 1024**3:.2f} GiB")
-logger.info(f"GPU memory reserved: {torch.cuda.memory_reserved() / 1024**3:.2f} GiB")
+def chat(user_input, history):
+    conversation = ""
+    for step in history:
+        conversation += f"User: {step[0]}\nBrother: {step[1]}\n"
+    conversation += f"User: {user_input}\nBrother:"
 
-# Send it!
-model.to(device)
-
-# Simple Prompt
-conversation = []
-
-print("You're about to start chatting with Brother-Bot! (Type `exit` to stop!)")
-
-while True:
-    new_input = input("Speak to me, brother: ")
-    if new_input.lower() in ["exit", "quit"]:
-        break
-    conversation.append(f"User: {new_input}")
-
-    prompt = "\n".join(conversation) + "\nBrother-Bot:"
-    
-    inputs = tokenizer(prompt, return_tensors="pt").to(device)
+    inputs = tokenizer(conversation, return_tensors="pt").to("cuda")
 
     # Generating the output
     with torch.no_grad():
         output = model.generate(
                 **inputs,
-                max_new_tokens=100,
+                max_new_tokens=150,
                 do_sample=True,
                 temperature=0.7,
                 top_p=.95,
                 eos_token_id=tokenizer.eos_token_id,
+                pad_token_id=tokenizer.eos_token_id,
         )
     # Model's response only
     # Decode and print
     generated_text = tokenizer.decode(output[0], skip_special_tokens=True)
 
     # Extracting his answer
-    reply = generated_text[len(prompt):].strip()
-    print(f"Brother-Bot: {reply}")
-    conversation.append(f"Brother-Bot: {reply}")
+    reply = generated_text[len(conversation):].strip()
+    return reply
 
-    print(f"\n++++ End Response ++++\n")
+# Launching the gradio application, defaults: localhost:7860
+gr.ChatInterface(fn=chat, title="The Big Dog Discourse").launch(server_name="0.0.0.0", server_port=7860, share=True)

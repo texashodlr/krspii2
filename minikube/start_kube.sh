@@ -64,7 +64,7 @@ sleep 5
 kubectl -n data-prep get pods
 # Checking logs
 kubectl -n data-prep logs pdf-text-token-converter
-sleep 60
+sleep 120
 kubectl -n data-prep logs pdf-text-token-converter
 kubectl -n data-prep exec pdf-uploader -- sh -c "ls -l /data/pdfs/processed | wc -l"
 kubectl -n data-prep exec pdf-uploader -- sh -c "ls -l /data/pdfs/pruned | wc -l"

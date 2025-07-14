@@ -6,7 +6,7 @@ metadata:
 spec:
   containers:
   - name: fine-tuner
-    image: baldbodybuilder/fine_tuner:local_v2.8
+    image: baldbodybuilder/fine_tuner:local
     resources:
       requests:
         cpu: "1"
@@ -23,3 +23,4 @@ spec:
     - name: pdf-volume
       persistentVolumeClaim:
         claimName: pdf-data-pvc
+  restartPolicy: Never
