@@ -77,4 +77,5 @@ kubectl -n data-prep delete pod pdf-text-token-converter --force
 # Apply the fine tuner job!
 kubectl apply -f k8s/yaml/stage_two/fine-tune-pod.yaml
 
-# python3 fine_tune_v2.py --data-dir /data/pdfs/pruned --output-dir /data/pdfs/model --model-name mistralai/Mistral-7B-v0.1 --lora-rank 8 --max-length 512
+# Once fine-tuner completes then run the actual chat model!
+kubectl apply -f k8s/yaml/stage_three/model-chat-pod.yaml

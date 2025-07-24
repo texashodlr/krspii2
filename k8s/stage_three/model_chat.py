@@ -2,7 +2,14 @@ import os
 import argparse
 import logging
 import subprocess
-from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, TrainingArguments, Trainer, DataCollatorForLanguageModeling
+from transformers import (
+    AutoModelForCausalLM,
+    AutoTokenizer,
+    BitsAndBytesConfig,
+    TrainingArguments,
+    Trainer,
+    DataCollatorForLanguageModeling,
+)
 from peft import PeftModel
 import torch
 import gradio as gr
@@ -14,46 +21,33 @@ use_bfloat16 = True
 
 
 # Logging -- as per the devops book!
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
-
-"""
-def token_input(token_file = 'banana.txt'):
-    with open(token_file, 'r') as file:
-        token = file.readline().strip()
-    return token
-
-def log_gpu_processes():
-    try:
-        nvidia_smi_output = subprocess.check_output(["nvidia-smi"], text=True)
-        logger.info(f"nvidia-smi output:\n{nvidia_smi_output}")
-    except subprocess.CalledProcessError as e:
-        logger.warning(f"Failed to run nvidia-smi: {e}")
-"""
 
 # Loading the tokenizer
 tokenizer = AutoTokenizer.from_pretrained(adapter_path)
 
 # Load quantized base model
 quant_config = BitsAndBytesConfig(
-        load_in_4bits=True,
-        bnb_4bit_compute_dtype=torch.bfloat16 if use_bfloat16 else torch.float16,
-        bnb_4bit_quant_type="nf4",
-        bnb_4bit_use_double_quant=True,
+    load_in_4bits=True,
+    bnb_4bit_compute_dtype=torch.bfloat16 if use_bfloat16 else torch.float16,
+    bnb_4bit_quant_type="nf4",
+    bnb_4bit_use_double_quant=True,
 )
 
 base = AutoModelForCausalLM.from_pretrained(
-        base_model,
-        device_map="auto",
-        quantization_config=quant_config,
-        torch_dtype=torch.bfloat16 if use_bfloat16 else torch.float16,
+    base_model,
+    device_map="auto",
+    quantization_config=quant_config,
+    torch_dtype=torch.bfloat16 if use_bfloat16 else torch.float16,
 )
 
 # Loading the LoRA Adapater
 model = PeftModel.from_pretrained(base, adapter_path)
 model.eval()
 
-# print("You're about to start chatting with Brother-Bot! (Type `exit` to stop!)")
 
 def chat(user_input, history):
     conversation = ""
@@ -66,13 +60,13 @@ def chat(user_input, history):
     # Generating the output
     with torch.no_grad():
         output = model.generate(
-                **inputs,
-                max_new_tokens=150,
-                do_sample=True,
-                temperature=0.7,
-                top_p=.95,
-                eos_token_id=tokenizer.eos_token_id,
-                pad_token_id=tokenizer.eos_token_id,
+            **inputs,
+            max_new_tokens=150,
+            do_sample=True,
+            temperature=0.7,
+            top_p=0.95,
+            eos_token_id=tokenizer.eos_token_id,
+            pad_token_id=tokenizer.eos_token_id,
         )
     # Model's response only
     # Decode and print
@@ -82,5 +76,8 @@ def chat(user_input, history):
     reply = generated_text[len(conversation):].strip()
     return reply
 
+
 # Launching the gradio application, defaults: localhost:7860
-gr.ChatInterface(fn=chat, title="The Big Dog Discourse").launch(server_name="0.0.0.0", server_port=7860, share=True)
+gr.ChatInterface(fn=chat, title="The Big Dog Discourse").launch(
+    server_name="0.0.0.0", server_port=7860, share=True
+)
