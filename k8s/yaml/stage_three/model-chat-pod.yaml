@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: fine-tuner
+  name: chat-bot
   namespace: data-prep
 spec:
   containers:
-  - name: fine-tuner
+  - name: chat-bot
     image: baldbodybuilder/fine_tuner:local
     resources:
       requests:
