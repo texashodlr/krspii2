@@ -26,6 +26,8 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 # Copy the preprocessing script
 COPY model_chat.py .
 
+ARG HF_TOKEN
+ENV HUGGINFACE_TOKEN=$HF_TOKEN
 
 # Command to run the script
 ENTRYPOINT ["python3", "model_chat.py"]

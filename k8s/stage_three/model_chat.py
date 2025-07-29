@@ -16,7 +16,7 @@ import gradio as gr
 
 # Importing model and adapters from previous pod which fine-tuned the model
 base_model = "mistralai/Mistral-7B-v0.1"
-adapter_path = "/data/pdfs/model"
+adapter_path = "../../data/model"
 use_bfloat16 = True
 
 
@@ -26,28 +26,33 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Loading the tokenizer
-tokenizer = AutoTokenizer.from_pretrained(adapter_path)
+def token_input(token_file = 'banana.txt'):
+    with open(token_file, 'r') as file:
+        token = file.readline().strip()
+    return token
 
-# Load quantized base model
-quant_config = BitsAndBytesConfig(
-    load_in_4bits=True,
-    bnb_4bit_compute_dtype=torch.bfloat16 if use_bfloat16 else torch.float16,
-    bnb_4bit_quant_type="nf4",
-    bnb_4bit_use_double_quant=True,
-)
+def model_load(token):
+    # Loading the tokenizer
+    tokenizer = AutoTokenizer.from_pretrained(adapter_path,token=HF_Token)
+    # Load quantized base model
+    quant_config = BitsAndBytesConfig(
+            load_in_4bits=True,
+            bnb_4bit_compute_dtype=torch.bfloat16 if use_bfloat16 else torch.float16,
+            bnb_4bit_quant_type="nf4",
+            bnb_4bit_use_double_quant=True,
+    )
 
-base = AutoModelForCausalLM.from_pretrained(
-    base_model,
-    device_map="auto",
-    quantization_config=quant_config,
-    torch_dtype=torch.bfloat16 if use_bfloat16 else torch.float16,
-)
-
-# Loading the LoRA Adapater
-model = PeftModel.from_pretrained(base, adapter_path)
-model.eval()
-
+    base = AutoModelForCausalLM.from_pretrained(
+            base_model,
+            device_map="auto",
+            quantization_config=quant_config,
+            torch_dtype=torch.bfloat16 if use_bfloat16 else torch.float16,
+            token=HF_Token,
+    )
+    # Loading the LoRA Adapater
+    model = PeftModel.from_pretrained(base, adapter_path)
+    model.eval()
+    return model, tokenizer
 
 def chat(user_input, history):
     conversation = ""
@@ -76,6 +81,11 @@ def chat(user_input, history):
     reply = generated_text[len(conversation):].strip()
     return reply
 
+
+# Tokens as usual
+HF_Token = token_input()
+logger.info(f"Token for HF: {HF_Token}")
+model, tokenizer = model_load(HF_Token)
 
 # Launching the gradio application, defaults: localhost:7860
 gr.ChatInterface(fn=chat, title="The Big Dog Discourse").launch(
