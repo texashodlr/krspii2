@@ -54,11 +54,14 @@ def model_load(token):
     model.eval()
     return model, tokenizer
 
-def chat(user_input, history):
+def chat(user_input, history, max_history=5):
+    history = history[-max_history:] if len(history) > max_history else history
     conversation = ""
-    for step in history:
-        conversation += f"User: {step[0]}\nBrother: {step[1]}\n"
+    for user_msg, assistant_msg in history:
+        conversation += f"User: {user_msg}\nBrother: {assistant_msg}\n"
     conversation += f"User: {user_input}\nBrother:"
+    
+    logger.info(f"Conversation prompt:\n{conversation}")
 
     inputs = tokenizer(conversation, return_tensors="pt").to("cuda")
 
@@ -78,16 +81,29 @@ def chat(user_input, history):
     generated_text = tokenizer.decode(output[0], skip_special_tokens=True)
 
     # Extracting his answer
-    reply = generated_text[len(conversation):].strip()
+    try:
+        reply_start = generated_text.rfind("Brother:") + len("Brother:")
+        reply = generated_text[reply_start:].strip()
+        if not reply:
+            reply = "No response generated."
+    except: 
+        reply = generated_text[len(conversation):].strip() or "No response generated."
+    logger.info(f"Extracted reply: {reply}")
     return reply
 
 
 # Tokens as usual
-HF_Token = token_input()
-logger.info(f"Token for HF: {HF_Token}")
-model, tokenizer = model_load(HF_Token)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Chat with fined-tuned a Big Dog!(Mistral-7b)")
+    parser.add_argument("--token-file", default="banana.txt", help="Path to Hugging face token file")
+    args = parser.parse_args()
 
-# Launching the gradio application, defaults: localhost:7860
-gr.ChatInterface(fn=chat, title="The Big Dog Discourse").launch(
-    server_name="0.0.0.0", server_port=7860, share=True
-)
+    HF_Token = token_input()
+    logger.info(f"Token for HF: {HF_Token}")
+    model, tokenizer = model_load(HF_Token)
+
+    # Launching the gradio application, defaults: localhost:7860
+    gr.ChatInterface(fn=chat,
+            title="The Big Dog Discourse",
+            additional_inputs=[gr.Slider(minimum=1, maximum=10, value=5,label="Max History Length")],
+    ).launch(server_name="0.0.0.0", server_port=7860, share=True)
