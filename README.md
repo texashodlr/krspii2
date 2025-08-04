@@ -1,10 +1,39 @@
 # krspii2
-## KubeRnetes-Scaled PIpelIne (for LLMs)
+## KubeRnetes-Scaled PIpelIne (_for LLMs_)
+### (Pronounced like the Krispy-Kreme donut shop (_no affliation_))
 (The 'ii2' is in the word pipeline)
 
-This repo is to explore a little bit of a whole lot: Python&CUDA, DevOps/IaC and some LLMs!
+Krspii2 is a project intended to explore running a simple LLM-pipeline in kubernetes pods on a workstation with a commerical GPU (in this instance on either my 4070, 3070 or old 1070s). This project is entirely about _the_ local, _the_ self-hosted--essentially operating with just 8GB of VRAM!
 
-## Terraform
+Krspii2 includes a small (~20ish) pdf-paper collection which then is ingested by a pod-hosted data-preprocessing stage, fed into a fine-tuning stage and then that fine-tuned mistral model is hosted as a chat bot to chat with (albeit quite shoddily).
+
+Bottom line, this project is to explore a little bit of a whole lot: data preprocessing, kubernetes and GPUs, pytorch and fine-tuning and some docker image writing!
+
+__To get started (and see what breaks!) just run `./minikube/start_kube.sh`__
+
+### Contents
+1. Repo Structure 
+2. Hardware (my-context)
+3. Stage One
+4. Stage Two
+5. Stage Three
+6. Stage Four
+7. YAMLs
+
+## Repo Structure
+
+## Hardware (my-context)
+
+## Stage One
+
+## Stage Two
+
+## Stage Three
+
+## Stage Four
+
+## Yamls
+
 
 ## Kubernetes
 Once we've terraformed out homelab nodes we need to then spin up a k8s cluster.
