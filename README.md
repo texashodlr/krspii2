@@ -9,7 +9,9 @@ Krspii2 includes a small (~20ish) pdf-paper collection which then is ingested by
 
 Bottom line, this project is to explore a little bit of a whole lot: data preprocessing, kubernetes and GPUs, pytorch and fine-tuning and some docker image writing!
 
-__To get started (and see what breaks!) just run `./minikube/start_kube.sh`__
+__To get started (and see what breaks!) just run:__
+
+ `./minikube/start_kube.sh`
 
 ### Contents
 1. Repo Structure 
@@ -21,6 +23,21 @@ __To get started (and see what breaks!) just run `./minikube/start_kube.sh`__
 7. YAMLs
 
 ## Repo Structure
+
+- data/
+- - model/ 	`Contains model weights obtained from fine-tuning`
+- - pdfs/  	`Contains the raw .pdf's`
+- - processed/  `Contains the .pdf's processed into raw .jsonl's`
+- - pruned/ 	`Contains the raw .jsonl's processed into .jsonl's used for fine-tuning`
+- k8s/
+- minikube/ 	`Contains the start_kube.sh script which runs the entire project`
+- src/		`Contains the docker image build folders`
+- - archive/
+- - stage_one/
+- - stage_two/
+- - stage_three/
+- - stage_four/
+	
 
 ## Hardware (my-context)
 
