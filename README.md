@@ -43,6 +43,22 @@ __To get started (and see what breaks!) just run:__
 
 ## Stage One
 
+The namespace of the entire pipeline is done in the data-prep namespace.
+
+Stage one is focused around the data-preprocessing stage of the LLM fine-tuning pipeline.
+
+`pdf-data-pv.yaml`
+Persistent Volume which the raw PDFs are loaded into, this PV is utililized for the entire lifecycle of krspii.
+
+`pdf-data-pvc.yaml`
+Persistent Volume Claim for the PV, this PVC is utilized for the entire lifecycle of krspii.
+
+`pdf-loader.yaml`
+A busybox pod which mounts the PV/C and then the start_kube.sh script uses this pod to copy the raw PDFs into the PV.
+
+`pdf-preprocess-job.yaml`
+A job which loads the pdf-preprocessor:v1.6 docker image which is basically just the pdf preprocessor python file that tokenizes the raw pdfs using Mistral AI's Mixtral-8x7B-v0.1 specifically because it fits in 8GB of VRAM.
+
 ## Stage Two
 
 ## Stage Three
