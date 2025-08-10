@@ -30,6 +30,11 @@ __To get started (and see what breaks!) just run:__
 - - processed/  `Contains the .pdf's processed into raw .jsonl's`
 - - pruned/ 	`Contains the raw .jsonl's processed into .jsonl's used for fine-tuning`
 - k8s/
+- - archive/
+- - yaml/
+- - - stage_one/ `Contains the yaml's that constitute the data-preprocessing stage of the pipeline`
+- - - stage_two/
+- - - stage_three/
 - minikube/ 	`Contains the start_kube.sh script which runs the entire project`
 - src/		`Contains the docker image build folders`
 - - archive/
@@ -59,7 +64,19 @@ A busybox pod which mounts the PV/C and then the start_kube.sh script uses this 
 `pdf-preprocess-job.yaml`
 A job which loads the pdf-preprocessor:v1.6 docker image which is basically just the pdf preprocessor python file that tokenizes the raw pdfs using Mistral AI's Mixtral-8x7B-v0.1 specifically because it fits in 8GB of VRAM.
 
+`pdf-text-token-converter.yaml`
+A pod that uses the text-token-converter docker image and basically takes the input jsonls and then cleans them up a bit more and corrects some minor configuration errors and makes the jsonls ingestible by the next stage.
+
 ## Stage Two
+
+`fine-tune-pod.yaml`
+A pod which utilizes the fine_tuner docker image and the local nvidia-gpu. It mounts the pdf-data-pv/c and executes the fine_tune_v2.py script (stage_three). The fine tuner script is the actual fine tuning process, taking the cleaned (pruned) jsonl's and executing the fine tuning on a mistralai/Mistral-7B-v0.1 model (once again as it fits in 8GB of VRAM). The output of this pod is the model weights which are saved to the mounted pvc.
+
+`fine_tune_job.yaml`, `fine-tune-pod-v2.yaml`, `fine_tune_job_v2.yaml`
+These are initial deprecated versions of the functional, production-ready `fine-tune-pod.yaml` and should be ignored.
+
+`checkpoint-pv.yaml`, `checkpoint-pvc.yaml`
+PVs that I initially thought about utilizing for the model weights but decided against splitting up the pdfs, jsonls, model weights and so forth, these could easily be reintroduced to further segregate the data in between stages.
 
 ## Stage Three
 
